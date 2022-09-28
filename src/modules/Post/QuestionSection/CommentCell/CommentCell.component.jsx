@@ -115,7 +115,7 @@ const CommentCell = ({
           ) : (
             <Fragment>
               <LinkButton
-                text={"You need to login to add a comment"}
+                text={"You need to connect wallet to add a comment"}
                 link={"/login"}
               />
             </Fragment>

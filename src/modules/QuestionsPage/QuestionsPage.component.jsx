@@ -16,7 +16,7 @@ import './QuestionsPage.styles.scss';
 
 const itemsPerPage = 10;
 
-const QuestionsPage = ({getPosts, post: {posts, loading}}) => {
+const QuestionsPage = ({getPosts, post: {posts, loading}, isAuthenticated}) => {
   useEffect(() => {
     getPosts();
   }, [getPosts]);
@@ -42,6 +42,7 @@ const QuestionsPage = ({getPosts, post: {posts, loading}}) => {
               text={'Ask Question'}
               link={'/add/question'}
               type={'s-btn__primary'}
+              isDisabled={!isAuthenticated}
             />
           </div>
         </div>
@@ -88,10 +89,12 @@ const QuestionsPage = ({getPosts, post: {posts, loading}}) => {
 QuestionsPage.propTypes = {
   getPosts: PropTypes.func.isRequired,
   post: PropTypes.object.isRequired,
+  isAuthenticated: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
   post: state.post,
+  isAuthenticated: state.auth.isAuthenticated,
 });
 
 export default connect(mapStateToProps, {getPosts})(QuestionsPage);

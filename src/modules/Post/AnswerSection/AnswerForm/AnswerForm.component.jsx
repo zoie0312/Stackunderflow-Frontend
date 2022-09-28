@@ -51,7 +51,7 @@ const AnswerForm = ({addAnswer, auth, post: {post}}) => {
       ) : (
         <Fragment>
           <LinkButton
-            text={'You need to login to add an answer'}
+            text={'You need to connect wallet to add an answer'}
             link={'/login'}
             type={'s-btn__outlined'}
             marginTop={'12px'}

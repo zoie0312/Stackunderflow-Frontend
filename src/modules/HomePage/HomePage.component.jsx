@@ -15,7 +15,7 @@ import './HomePage.styles.scss';
 
 const itemsPerPage = 10;
 
-const HomePage = ({getPosts, post: {posts, loading}}) => {
+const HomePage = ({getPosts, post: {posts, loading}, isAuthenticated}) => {
   useEffect(() => {
     getPosts();
   }, [getPosts]);
@@ -37,6 +37,7 @@ const HomePage = ({getPosts, post: {posts, loading}}) => {
               text={'Ask Question'}
               link={'/add/question'}
               type={'s-btn__primary'}
+              isDisabled={!isAuthenticated}
             />
           </div>
         </div>
@@ -79,10 +80,12 @@ const HomePage = ({getPosts, post: {posts, loading}}) => {
 HomePage.propTypes = {
   getPosts: PropTypes.func.isRequired,
   post: PropTypes.object.isRequired,
+  isAuthenticated: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
   post: state.post,
+  isAuthenticated: state.auth.isAuthenticated,
 });
 
 export default connect(mapStateToProps, { getPosts })(HomePage);
