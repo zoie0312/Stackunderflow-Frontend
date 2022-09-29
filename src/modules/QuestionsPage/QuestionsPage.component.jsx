@@ -28,6 +28,10 @@ const QuestionsPage = ({getPosts, post: {posts, loading}, isAuthenticated}) => {
 
   const handlePaginationChange = (e, value) => setPage(value);
 
+  const onAskQuestionBtnClick = isAuthenticated ? 
+    () => {} : 
+    () => alert('Please connect wallet');
+
   return loading || posts === null ? (
     <Spinner type='page' width='75px' height='200px' />
   ) : (
@@ -42,6 +46,7 @@ const QuestionsPage = ({getPosts, post: {posts, loading}, isAuthenticated}) => {
               text={'Ask Question'}
               link={'/add/question'}
               type={'s-btn__primary'}
+              handleClick={onAskQuestionBtnClick}
               isDisabled={!isAuthenticated}
             />
           </div>

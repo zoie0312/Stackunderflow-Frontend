@@ -1,3 +1,6 @@
+import { ethers } from "ethers";
+import Web3Modal from "web3modal";
+
 import { loadUserData, registerUser, loginUser } from '../../api/authApi'
 import setAuthToken from './auth.utils';
 import {setAlert} from '../alert/alert.actions';
@@ -9,7 +12,15 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT,
+  WALLET_CONNECT_SUCCESS,
+  WALLET_DISCONNECT_SUCCESS
 } from './auth.types';
+
+const web3Modal = new Web3Modal({
+  cacheProvider: true, // optional
+  network: 'rinkeby',
+  providerOptions: {} // required
+});
 
 // Load User
 export const loadUser = () => async (dispatch) => {
@@ -81,3 +92,32 @@ export const logout = () => (dispatch) => {
 
   dispatch({type: LOGOUT});
 };
+
+export const connectWallet = () => async (dispatch) => {
+  try {
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    const network = await provider.getNetwork();
+    console.log('wallet address, ', address);
+    console.log('network id, ', network.chainId);
+    dispatch({
+      type: WALLET_CONNECT_SUCCESS,
+      payload: {
+        provider,
+        wallet: {
+          address
+        }
+      }
+    })
+  } catch (error) {
+    console.log('wallet connect error, ', error);
+  }
+};
+
+export const disconnectWallet = () => async (dispatch) => {
+  await web3Modal.clearCachedProvider();
+  dispatch({
+    type: WALLET_DISCONNECT_SUCCESS})
+}

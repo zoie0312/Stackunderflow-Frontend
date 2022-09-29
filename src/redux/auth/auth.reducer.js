@@ -6,6 +6,8 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT,
+  WALLET_CONNECT_SUCCESS,
+  WALLET_DISCONNECT_SUCCESS,
 } from './auth.types';
 
 const initialState = {
@@ -13,6 +15,8 @@ const initialState = {
   isAuthenticated: null,
   loading: true,
   user: null,
+  provider: null,
+  wallet: null
 };
 
 export default function auth(state = initialState, action) {
@@ -45,6 +49,20 @@ export default function auth(state = initialState, action) {
         isAuthenticated: false,
         loading: false,
       };
+    case WALLET_CONNECT_SUCCESS:
+      return {
+        ...state,
+        isAuthenticated: true,
+        provider: action.payload.provider,
+        wallet: action.payload.wallet
+      }
+    case WALLET_DISCONNECT_SUCCESS: 
+      return {
+        ...state,
+        isAuthenticated: false,
+        provider: null,
+        wallet: null
+      }
     default:
       return state;
   }

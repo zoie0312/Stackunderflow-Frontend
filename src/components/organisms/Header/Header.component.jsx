@@ -3,6 +3,7 @@ import {Link, useHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { logout } from '../../../redux/auth/auth.actions';
+import { connectWallet, disconnectWallet } from '../../../redux/auth/auth.actions';
 
 import {ReactComponent as Search} from '../../../assets/Search.svg';
 import {ReactComponent as Logo} from '../../../assets/LogoMd.svg';
@@ -13,31 +14,53 @@ import MobileSideBar from '../../organisms/MobileSideBar/MobileSideBar.component
 
 import './Header.styles.scss';
 
-const Header = ({auth: {isAuthenticated, loading, user}, logout}) => {
+const Header = ({auth: {isAuthenticated, loading, user, wallet}, logout, connectWallet, disconnectWallet}) => {
   let history = useHistory();
   const [searchState, setSearchState] = useState(false);
-
-  const authLinks = (
-    <div className='btns'>
-      {loading || user === null ? (
-        <Spinner width='50px' height='50px' />
-      ) : (
-        <Link to={`/users/${user.id}`} title={user.username}>
-          <img
-            alt='user-logo'
-            className='logo'
-            src={user.gravatar}
+console.log('wallet? ', wallet);
+  const AuthLinks = () => {
+    if (wallet) {
+      return (
+        <div className='btns'>
+          {wallet.address}
+          
+          <button className={`s-btn s-btn__primary`} onClick={disconnectWallet}>
+            Disconnect
+          </button>
+        </div>    
+      )
+    } else if (loading || user === null) {
+      return (
+        <div className='btns'>
+          <Spinner width='50px' height='50px' />
+          <LinkButton
+            text={'Log out'}
+            link={'/login'}
+            type={'s-btn__filled'}
+            handleClick={logout}
           />
-        </Link>
-      )}
-      <LinkButton
-        text={'Log out'}
-        link={'/login'}
-        type={'s-btn__filled'}
-        handleClick={logout}
-      />
-    </div>
-  );
+        </div>    
+      )
+    }else {
+      return (
+        <div className='btns'>
+          <Link to={`/users/${user.id}`} title={user.username}>
+            <img
+              alt='user-logo'
+              className='logo'
+              src={user.gravatar}
+            />
+          </Link>
+          <LinkButton
+            text={'Log out'}
+            link={'/login'}
+            type={'s-btn__filled'}
+            handleClick={logout}
+          />
+        </div> 
+      )
+    }
+  }
 
   const authTabs = (
     <div className='s-navigation'>
@@ -61,10 +84,18 @@ const Header = ({auth: {isAuthenticated, loading, user}, logout}) => {
     </div>
   );
 
+  const onWalletBtnClick = () => {
+    //console.log('going to connect wallet');
+    connectWallet();
+  }
+
   const guestLinks = (
     <div className='btns'>
-      <LinkButton text={'Connect Wallet'} link={'/login'} type={'s-btn__primary'} />
-      {/* <LinkButton text={'Sign up'} link={'/register'} type={'s-btn__filled'} /> */}
+      {/* <LinkButton text={'Connect Wallet'} link={'/login'} type={'s-btn__primary'} />
+      <LinkButton text={'Sign up'} link={'/register'} type={'s-btn__filled'} />  */}
+      <button className={`s-btn s-btn__primary`} onClick={onWalletBtnClick}>
+        Connect Wallet
+      </button>
     </div>
   );
 
@@ -131,7 +162,7 @@ const Header = ({auth: {isAuthenticated, loading, user}, logout}) => {
           <div className="header-search-div">
           <Search className="search-icon" onClick={() => setSearchState(!searchState)} />
           {!loading && (
-            <Fragment>{isAuthenticated ? authLinks : guestLinks}</Fragment>
+            <Fragment>{isAuthenticated ? <AuthLinks/> : guestLinks}</Fragment>
           )}
         </div>
       </nav>
@@ -149,4 +180,4 @@ const mapStateToProps = (state) => ({
   auth: state.auth,
 });
 
-export default connect(mapStateToProps, {logout})(Header);
+export default connect(mapStateToProps, {logout, connectWallet, disconnectWallet})(Header);
