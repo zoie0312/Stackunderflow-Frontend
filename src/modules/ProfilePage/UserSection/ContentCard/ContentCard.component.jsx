@@ -37,6 +37,7 @@ const ContentCard = ({
 }) => {
     const [metadataUri, setMetadataUri] = useState('');
     const [readToMint, setReadyToMint] = useState(false);
+    const [isSendingScore, setIsSendingScore] = useState(false);
     const { isConnected, address } = useAccount();
     if (isConnected) {
         console.log('wallet connected ', address);
@@ -88,6 +89,7 @@ const ContentCard = ({
     }, []);
     
     const onIPFSStoringClick = async () => {
+        setIsSendingScore(true);
         const mainBar = document.getElementById('mainbar');
         console.log("screenshooting user profile and score word-cloud then send to IPFS ");
         
@@ -109,6 +111,7 @@ const ContentCard = ({
         console.log('ipfs user score NFT metadata ', wordCloudMetadata);
         setMetadataUri(wordCloudMetadata.url);
         setReadyToMint(true);
+        setIsSendingScore(false);
     };
     
     
@@ -188,7 +191,7 @@ const ContentCard = ({
             <div className="nft-area">
                 <div className="wordCloud-container"></div>
                 <div className="mint-container">
-                    <button className="s-btn s-btn__filled" type="button" onClick={onIPFSStoringClick}>Send score proof to IPFS</button>
+                    <button className={`s-btn s-btn__filled ${isSendingScore ? 'is-loading' : ''}`} type="button" onClick={onIPFSStoringClick}>Send score proof to IPFS</button>
                     <button className="s-btn s-btn__filled" type="button" disabled={!readToMint} onClick={onMintClick}>Mint a score NFT</button>
                 </div>
             </div>
