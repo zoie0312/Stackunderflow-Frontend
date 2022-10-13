@@ -4,7 +4,9 @@ import TagBadge from "../../../components/molecules/TagBadge/TagBadge.component"
 
 import './UserActivity.styles.scss';
 
+
 const UserActivity = () => (
+  
   <div className='grid-cell2'>
     <div className='top-tags'>
       <h3 className='fw-bold fc-dark bc-black-3'>Top Tags</h3>

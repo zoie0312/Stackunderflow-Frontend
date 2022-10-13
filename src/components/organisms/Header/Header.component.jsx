@@ -1,6 +1,13 @@
 import React, {Fragment, useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {connect} from 'react-redux';
+import {
+  ConnectButton,
+} from "@rainbow-me/rainbowkit";
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
+import { chain } from 'wagmi'
+
 import PropTypes from 'prop-types';
 import { logout } from '../../../redux/auth/auth.actions';
 import { connectWallet, disconnectWallet } from '../../../redux/auth/auth.actions';
@@ -14,17 +21,23 @@ import MobileSideBar from '../../organisms/MobileSideBar/MobileSideBar.component
 
 import './Header.styles.scss';
 
+const connector = new MetaMaskConnector({
+  chains: [chain.mainnet, chain.optimism, chain.goerli],
+})
+
 const Header = ({auth: {isAuthenticated, loading, user, wallet}, logout, connectWallet, disconnectWallet}) => {
   let history = useHistory();
   const [searchState, setSearchState] = useState(false);
-console.log('wallet? ', wallet);
+  const { address, isDisconnected } = useAccount()
+  const { connect, connectors, error, isLoading } = useConnect();
+  const { disconnect } = useDisconnect()
   const AuthLinks = () => {
-    if (wallet) {
+    if (address) {
       return (
         <div className='btns'>
-          {wallet.address}
+          {address}
           
-          <button className={`s-btn s-btn__primary`} onClick={disconnectWallet}>
+          <button className={`s-btn s-btn__primary`} onClick={onDisconnectBtnClick}>
             Disconnect
           </button>
         </div>    
@@ -85,8 +98,11 @@ console.log('wallet? ', wallet);
   );
 
   const onWalletBtnClick = () => {
-    //console.log('going to connect wallet');
-    connectWallet();
+    //connectWallet();
+    connect({ connector });
+  };
+  let onDisconnectBtnClick = () => {
+    disconnect();
   }
 
   const guestLinks = (
@@ -144,7 +160,8 @@ console.log('wallet? ', wallet);
           <form
             id='search'
             onSubmit={() => history.push('/questions')}
-            className={`grid--cell fl-grow1 searchbar px12 js-searchbar`}
+            className={`grid--cell searchbar px12 js-searchbar`}
+            style={{'width': '40%'}}
             autoComplete='off'
           >
             <div className='ps-relative search-frame'>
@@ -162,8 +179,9 @@ console.log('wallet? ', wallet);
           <div className="header-search-div">
           <Search className="search-icon" onClick={() => setSearchState(!searchState)} />
           {!loading && (
-            <Fragment>{isAuthenticated ? <AuthLinks/> : guestLinks}</Fragment>
+            <Fragment>{isDisconnected ? guestLinks : <AuthLinks/>}</Fragment>
           )}
+          
         </div>
       </nav>
       {searchState && <SearchBar />}
