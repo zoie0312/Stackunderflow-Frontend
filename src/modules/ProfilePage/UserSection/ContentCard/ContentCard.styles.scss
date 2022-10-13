@@ -2,10 +2,13 @@
   box-sizing: border-box;
   margin: 12px;
   flex: 1 auto !important;
+  display: flex;
+  flex-direction: row;
 
   .content-grid {
     margin: -8px;
     display: flex;
+    flex: 6;
     flex-direction: column;
 
     .info-cell {
@@ -72,6 +75,27 @@
             }
           }
         }
+      }
+    }
+  }
+
+  .nft-area {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .wordCloud-container {
+      width: 200px;
+      height: 200px;
+    }
+
+    .mint-container {
+      display: flex;
+      flex-direction: row;
+
+      button {
+        margin: 2px
       }
     }
   }
