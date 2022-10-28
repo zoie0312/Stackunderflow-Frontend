@@ -6,7 +6,6 @@ import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
-
 import store from "./redux/store";
 import setAuthToken from "./redux/auth/auth.utils";
 import { loadUser } from "./redux/auth/auth.actions";
@@ -37,7 +36,12 @@ const { chains, provider } = configureChains(
         chain.arbitrum,
         chain.goerli,
     ],
-    [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
+    [
+        alchemyProvider({
+            apiKey: String(process.env.REACT_APP_ALCHEMY_API_KEY),
+        }),
+        publicProvider(),
+    ]
 );
 
 const { connectors } = getDefaultWallets({
@@ -56,9 +60,9 @@ if (localStorage.token) {
 }
 
 const App = () => {
-    useEffect(() => {
-        store.dispatch(loadUser());
-    }, []);
+    // useEffect(() => {
+    //     store.dispatch(loadUser());
+    // }, []);
 
     return (
         <WagmiConfig client={wagmiClient}>
