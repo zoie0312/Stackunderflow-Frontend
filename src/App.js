@@ -60,9 +60,9 @@ if (localStorage.token) {
 }
 
 const App = () => {
-    // useEffect(() => {
-    //     store.dispatch(loadUser());
-    // }, []);
+    useEffect(() => {
+        store.dispatch(loadUser());
+    }, []);
 
     return (
         <WagmiConfig client={wagmiClient}>

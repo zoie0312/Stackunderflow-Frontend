@@ -22,16 +22,21 @@ import { auth, moralisAuth } from "../../firebase";
 
 // Load User
 export const loadUser = () => async (dispatch) => {
-    if (localStorage.token) {
-        setAuthToken(localStorage.token);
-    }
+    // if (localStorage.token) {
+    //     setAuthToken(localStorage.token);
+    // }
     try {
-        const res = await loadUserData();
+        //const res = await loadUserData();
 
-        dispatch({
-            type: USER_LOADED,
-            payload: res.data.data,
-        });
+        if (auth.currentUser) {
+            const docRef = doc(db, "users", auth.currentUser.uid);
+            const docSnap = await getDoc(docRef);
+            dispatch({
+                type: USER_LOADED,
+                payload: docSnap.data(),
+            });
+        }
+        
     } catch (err) {
         dispatch({
             type: AUTH_ERROR,

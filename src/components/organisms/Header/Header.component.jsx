@@ -27,7 +27,7 @@ const connector = new MetaMaskConnector({
 });
 
 const Header = ({
-    auth: { isAuthenticated, loading, user, wallet, walletAddress },
+    auth: { isAuthenticated, loading, user },
     logout,
     walletLogin,
     walletLogout,
@@ -54,10 +54,10 @@ const Header = ({
     };
 
     const AuthLinks = () => {
-        if (walletAddress) {
+        if (user.address) {
             return (
                 <div className="btns">
-                    {getDisplayAddress(walletAddress)}
+                    {getDisplayAddress(user.address)}
 
                     <button
                         className={`s-btn s-btn__primary`}
