@@ -14,15 +14,15 @@ import { ethers } from 'ethers';
 import "./ContentCard.styles.scss";
 import { StackunderflowNftABI, StackunderflowNftContractAddress } from "../../../../abi/StackunderflowNft";
 
-const scores = {
-    css: 5,
-    python: 4,
-    react: 10,
-    jquery: 2,
-    sql: 1,
-    javascript: 15,
-    reactnative: 10
-}
+// const scores = {
+//     css: 5,
+//     python: 4,
+//     react: 10,
+//     jquery: 2,
+//     sql: 1,
+//     javascript: 15,
+//     reactnative: 10
+// }
 
 const NFT_STORAGE_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGRiODQ4QmE5NWZmN0ZCYmY1OWYxN0RhYkM2ODg2MDVmMjlkNEYzNjgiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY2NTEyMjI4MTQ0NSwibmFtZSI6IlN0YWNrdW5kZXJmbG93In0.pZ3RMnkFG8tFwR1HqXHbTaPncjn-vMLCWtqColY96JE';
 const client = new NFTStorage({ token: NFT_STORAGE_TOKEN });
@@ -34,6 +34,8 @@ const ContentCard = ({
     comments_count,
     tags_count,
     created_at,
+    id,
+    scores,
 }) => {
     const [metadataUri, setMetadataUri] = useState('');
     const [readToMint, setReadyToMint] = useState(false);
@@ -65,28 +67,32 @@ const ContentCard = ({
 
     useEffect(() => {
         const wordCloudCtr = document.getElementsByClassName("wordCloud-container")[0];
-        const scoreText = Object.keys(scores).reduce((acc, key) => {
-            const times = scores[key];
-            let str = "";
-            for (let i=0; i<times; i++){
-                str += key.toString();
-                str += " ";
-            }
-            return acc + str;
-        },"");
+        if (scores && Object.keys(scores).length > 0) {
+            const scoreText = Object.keys(scores).reduce((acc, key) => {
+                const times = scores[key];
+                let str = "";
+                for (let i=0; i<times; i++){
+                    str += key.toString();
+                    str += " ";
+                }
+                return acc + str;
+            },"");
 
-        fetch(
-            `https://quickchart.io/wordcloud?width=200&height=200&rotation=0&backgroundColor=white&text=${scoreText}` 
-        )
-            .then(function (response) {
-                wordCloudCtr.innerHTML = "";
-                return response.text();
-            })
-            .then(function (myText) {
-                console.log(myText);
-                wordCloudCtr.innerHTML += myText;
-            });
-    }, []);
+            fetch(
+                `https://quickchart.io/wordcloud?width=200&height=200&rotation=0&backgroundColor=white&text=${scoreText}` 
+            )
+                .then(function (response) {
+                    wordCloudCtr.innerHTML = "";
+                    return response.text();
+                })
+                .then(function (myText) {
+                    console.log(myText);
+                    wordCloudCtr.innerHTML += myText;
+                });
+        }else {
+            wordCloudCtr.innerHTML = "";
+        }
+    }, [scores, id]);
     
     const onIPFSStoringClick = async () => {
         setIsSendingScore(true);

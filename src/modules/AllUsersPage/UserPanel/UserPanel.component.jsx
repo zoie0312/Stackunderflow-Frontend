@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import './UserPanel.styles.scss';
 
 const UserPanel = ({
-  user: {id, username, created_at, posts_count, tags_count, views, gravatar},
+  user: {id, username, created_at, posts_count, tags_count, views, gravatar },
 }) => {
   return (
     <Fragment>

@@ -8,8 +8,6 @@ import { chain } from "wagmi";
 
 import { logout } from "../../../redux/auth/auth.actions";
 import {
-    connectWallet,
-    disconnectWallet,
     walletLogin,
     walletLogout,
 } from "../../../redux/auth/auth.actions";
@@ -29,10 +27,8 @@ const connector = new MetaMaskConnector({
 });
 
 const Header = ({
-    auth: { isAuthenticated, loading, user, wallet, walletAddress },
+    auth: { isAuthenticated, loading, user },
     logout,
-    connectWallet,
-    disconnectWallet,
     walletLogin,
     walletLogout,
 }) => {
@@ -58,10 +54,10 @@ const Header = ({
     };
 
     const AuthLinks = () => {
-        if (walletAddress) {
+        if (user.address) {
             return (
                 <div className="btns">
-                    {getDisplayAddress(walletAddress)}
+                    {getDisplayAddress(user.address)}
 
                     <button
                         className={`s-btn s-btn__primary`}
@@ -230,8 +226,6 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {
     logout,
-    connectWallet,
-    disconnectWallet,
     walletLogin,
     walletLogout,
 })(Header);
