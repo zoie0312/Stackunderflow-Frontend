@@ -1,4 +1,4 @@
-import {GET_USERS, GET_USER, USER_ERROR} from './users.types';
+import {GET_USERS, GET_USER, USER_ERROR, UPDATE_USER_SCORE} from './users.types';
 
 const initialState = {
   users: [],
@@ -21,6 +21,14 @@ export default function users(state = initialState, action) {
         user: action.payload,
         loading: false,
       };
+    case UPDATE_USER_SCORE:
+        return {
+            ...state,
+            user: {
+                ...state.user,
+                scores: action.payload
+            }
+        };
     case USER_ERROR:
       return {
         ...state,

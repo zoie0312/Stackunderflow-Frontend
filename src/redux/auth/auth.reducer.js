@@ -6,8 +6,6 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
     LOGOUT,
-    WALLET_CONNECT_SUCCESS,
-    WALLET_DISCONNECT_SUCCESS,
     WALLET_LOGIN_SUCCESS,
     WALLET_LOGOUT,
     WALLET_AUTHENTICATING,
@@ -74,20 +72,6 @@ export default function auth(state = initialState, action) {
                 firebaseUid: null,
                 isAuthenticated: false,
                 loading: false,
-            };
-        case WALLET_CONNECT_SUCCESS:
-            return {
-                ...state,
-                isAuthenticated: true,
-                provider: action.payload.provider,
-                wallet: action.payload.wallet,
-            };
-        case WALLET_DISCONNECT_SUCCESS:
-            return {
-                ...state,
-                isAuthenticated: false,
-                provider: null,
-                wallet: null,
             };
         default:
             return state;

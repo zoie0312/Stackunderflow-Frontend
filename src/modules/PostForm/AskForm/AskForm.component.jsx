@@ -7,7 +7,7 @@ import { badWordsFilter } from "../../../utils/censorBadWords";
 
 import "./AskForm.styles.scss";
 
-const AskForm = ({ addPost }) => {
+const AskForm = ({ addPost, auth: { user } }) => {
   const [formData, setFormData] = useState({
     title: "",
     body: "",
@@ -66,7 +66,7 @@ const AskForm = ({ addPost }) => {
     // if there are errors, don't submit
     if (errors.length > 0) return;
 
-    addPost({ title, body, tagname });
+    addPost({ title, body, tagname, user });
 
     setFormData({
       title: "",
@@ -158,4 +158,8 @@ AskForm.propTypes = {
   addPost: PropTypes.func.isRequired,
 };
 
-export default connect(null, { addPost })(AskForm);
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
+
+export default connect(mapStateToProps, { addPost })(AskForm);

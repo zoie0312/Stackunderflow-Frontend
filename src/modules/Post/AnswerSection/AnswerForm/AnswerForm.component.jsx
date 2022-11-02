@@ -20,7 +20,7 @@ const AnswerForm = ({addAnswer, auth, post: {post}}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    addAnswer(post.id, {text});
+    addAnswer(post.id, post.tags, {text}, auth.user);
     setFormData({
       text: '',
     });

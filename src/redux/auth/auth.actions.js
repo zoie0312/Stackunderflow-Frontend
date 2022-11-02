@@ -1,6 +1,6 @@
-import { ethers } from "ethers";
-import Web3Modal from "web3modal";
 import { signInWithMoralis as signInWithMoralisByEvm } from "@moralisweb3/client-firebase-evm-auth";
+import { db } from "../../firebase";
+import { getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { loadUserData, registerUser, loginUser } from "../../api/authApi";
 import setAuthToken from "./auth.utils";
@@ -13,19 +13,12 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
     LOGOUT,
-    WALLET_CONNECT_SUCCESS,
-    WALLET_DISCONNECT_SUCCESS,
     WALLET_LOGIN_SUCCESS,
     WALLET_LOGOUT,
     WALLET_AUTHENTICATING,
 } from "./auth.types";
 import { auth, moralisAuth } from "../../firebase";
 
-const web3Modal = new Web3Modal({
-    cacheProvider: true, // optional
-    network: "rinkeby",
-    providerOptions: {}, // required
-});
 
 // Load User
 export const loadUser = () => async (dispatch) => {
@@ -42,6 +35,45 @@ export const loadUser = () => async (dispatch) => {
     } catch (err) {
         dispatch({
             type: AUTH_ERROR,
+        });
+    }
+};
+
+export const loadUserByWallet = (userCredential) => async (dispatch) => {
+    const {displayName: address, uid} = userCredential;
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    const userData = docSnap.data();
+    console.log("userData: ", userData);
+    if (!userData) {
+        await setDoc(doc(db, 'users', uid), {
+            id: uid,
+            address,
+            username: 'new user',
+            created_at: serverTimestamp(),
+            gravatar: `https://secure.gravatar.com/avatar/${Math.floor(Math.random()*100)+1}?s=164&d=identicon`,
+            scores: {},
+            posts_count: 0,
+            tags_count: 0
+        });
+        dispatch({
+            type: USER_LOADED,
+            payload: {
+                id: uid,
+                address,
+                username: 'new user',
+                scores: {}
+            },
+        });
+    }else {
+        dispatch({
+            type: USER_LOADED,
+            payload: {
+                address,
+                username: userData.username,
+                id: userData.id,
+                scores: userData.scores
+            },
         });
     }
 };
@@ -98,6 +130,8 @@ export const walletLogin = () => async (dispatch) => {
     try {
         dispatch({ type: WALLET_AUTHENTICATING });
         const res = await signInWithMoralisByEvm(moralisAuth);
+        dispatch(loadUserByWallet(res.credentials.user));
+
         dispatch({
             type: WALLET_LOGIN_SUCCESS,
             payload: res.credentials.user,
@@ -123,32 +157,3 @@ export const logout = () => (dispatch) => {
     dispatch({ type: LOGOUT });
 };
 
-export const connectWallet = () => async (dispatch) => {
-    try {
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        const network = await provider.getNetwork();
-        console.log("wallet address, ", address);
-        console.log("network id, ", network.chainId);
-        dispatch({
-            type: WALLET_CONNECT_SUCCESS,
-            payload: {
-                provider,
-                wallet: {
-                    address,
-                },
-            },
-        });
-    } catch (error) {
-        console.log("wallet connect error, ", error);
-    }
-};
-
-export const disconnectWallet = () => async (dispatch) => {
-    await web3Modal.clearCachedProvider();
-    dispatch({
-        type: WALLET_DISCONNECT_SUCCESS,
-    });
-};

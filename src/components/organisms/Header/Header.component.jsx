@@ -8,8 +8,6 @@ import { chain } from "wagmi";
 
 import { logout } from "../../../redux/auth/auth.actions";
 import {
-    connectWallet,
-    disconnectWallet,
     walletLogin,
     walletLogout,
 } from "../../../redux/auth/auth.actions";
@@ -31,8 +29,6 @@ const connector = new MetaMaskConnector({
 const Header = ({
     auth: { isAuthenticated, loading, user, wallet, walletAddress },
     logout,
-    connectWallet,
-    disconnectWallet,
     walletLogin,
     walletLogout,
 }) => {
@@ -230,8 +226,6 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {
     logout,
-    connectWallet,
-    disconnectWallet,
     walletLogin,
     walletLogout,
 })(Header);

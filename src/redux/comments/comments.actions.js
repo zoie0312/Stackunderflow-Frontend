@@ -1,3 +1,5 @@
+import { db } from "../../firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { setAlert } from "../alert/alert.actions";
 import {
   GET_COMMENTS,
@@ -5,15 +7,21 @@ import {
   ADD_COMMENT,
   DELETE_COMMENT,
 } from "./comments.types";
-import { allCommentsData, createSingleComment, deleteSingleComment } from "../../api/commentsApi";
+import { createSingleComment, deleteSingleComment } from "../../api/commentsApi";
 
 export const getComments = (id) => async (dispatch) => {
   try {
-    const res = await allCommentsData(id);
+
+    const q = query(
+      collection(db, "comments"),
+      where("post_id", "==", id)
+  );
+  const querySnapshot = await getDocs(q);
+  const commentsData = querySnapshot.docs.map((doc) => doc.data());
 
     dispatch({
       type: GET_COMMENTS,
-      payload: res.data.data,
+      payload: commentsData,
     });
   } catch (err) {
     dispatch({
