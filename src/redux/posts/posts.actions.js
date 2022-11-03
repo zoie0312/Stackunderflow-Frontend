@@ -1,5 +1,14 @@
 import { db } from "../../firebase";
-import { collection, getDocs, getDoc, doc, serverTimestamp, setDoc, query, where } from "firebase/firestore";
+import {
+    collection,
+    getDocs,
+    getDoc,
+    doc,
+    serverTimestamp,
+    setDoc,
+    query,
+    where,
+} from "firebase/firestore";
 
 import { setAlert } from "../alert/alert.actions";
 import {
@@ -10,9 +19,7 @@ import {
     DELETE_POST,
     ADD_POST,
 } from "./posts.types";
-import {
-    deleteSinglePost,
-} from "../../api/postsApis";
+import { deleteSinglePost } from "../../api/postsApis";
 import { updateUserScores } from "../users/users.actions";
 
 // Get posts
@@ -103,40 +110,45 @@ export const addPost = (formData) => async (dispatch) => {
             .map((tag) => tag.trim());
 
         const newPostRef = doc(collection(db, "posts"));
-        const promises = tags.map((tagName) => new Promise((resolve, reject) => {
-            const q = query(
-                collection(db, "tags"),
-                where("tagname", "==", tagName)
-            );
-            getDocs(q).then(querySnapshot => {
-                if (!querySnapshot.empty) {
-                    const tagData = querySnapshot.docs[0];
-                    resolve({
-                        tagname: tagName,
-                        id: tagData.id,
-                        posttag: {
-                            createdAt: (new Date()).toISOString(),
-                            post_id: newPostRef.id,
-                            tag_id: tagData.id,
-                            updatedAt: (new Date()).toISOString()
-                        }
-                    })
-                } else {
-                    resolve('');    
-                }
-                
-            }).catch(err => reject(err))
-            
-        }) );
+        const promises = tags.map(
+            (tagName) =>
+                new Promise((resolve, reject) => {
+                    const q = query(
+                        collection(db, "tags"),
+                        where("tagname", "==", tagName)
+                    );
+                    getDocs(q)
+                        .then((querySnapshot) => {
+                            if (!querySnapshot.empty) {
+                                const tagData = querySnapshot.docs[0];
+                                resolve({
+                                    tagname: tagName,
+                                    id: tagData.id,
+                                    posttag: {
+                                        createdAt: new Date().toISOString(),
+                                        post_id: newPostRef.id,
+                                        tag_id: tagData.id,
+                                        updatedAt: new Date().toISOString(),
+                                    },
+                                });
+                            } else {
+                                resolve("");
+                            }
+                        })
+                        .catch((err) => reject(err));
+                })
+        );
         const promiseResult = await Promise.all(promises);
-        
-        const tagsData = promiseResult.filter(result => result !== '');
-        console.log('new post id, ', newPostRef.id);
+
+        const tagsData = promiseResult.filter((result) => result !== "");
+
         const newPostData = {
             answer_count: 0,
             comment_count: 0,
             views: 0,
-            gravatar: `https://secure.gravatar.com/avatar/${Math.floor(Math.random()*100)+1}?s=164&d=identicon`,
+            gravatar: `https://secure.gravatar.com/avatar/${
+                Math.floor(Math.random() * 100) + 1
+            }?s=164&d=identicon`,
             id: newPostRef.id,
             user_id: user.id,
             username: user.username,
@@ -144,31 +156,33 @@ export const addPost = (formData) => async (dispatch) => {
             title,
             created_at: serverTimestamp(),
             updated_at: serverTimestamp(),
-            tags: tagsData
+            tags: tagsData,
         };
         await setDoc(newPostRef, newPostData);
-
+        console.log("new post id, ", newPostRef.id);
         dispatch({
             type: ADD_POST,
             payload: newPostData,
         });
-        dispatch(updateUserScores({
-            user,
-            tags,
-            type: 'BY_QUESTION'
-        }));
+        dispatch(
+            updateUserScores({
+                user,
+                tags,
+                type: "BY_QUESTION",
+            })
+        );
 
-        dispatch(setAlert('Add a new Question', "success"));
+        dispatch(setAlert("Add a new Question", "success"));
 
         dispatch(getPosts());
     } catch (err) {
-        dispatch(setAlert(err, "danger"));
+        dispatch(setAlert(err.toString(), "danger"));
 
         dispatch({
             type: POST_ERROR,
             payload: {
-                msg: err,
-                status: 'Error',
+                msg: err.toString(),
+                status: "Error",
             },
         });
     }
