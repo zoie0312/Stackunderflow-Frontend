@@ -62,7 +62,7 @@ export default function auth(state = initialState, action) {
                 ...state,
                 walletAddress: action.payload.displayName,
                 firebaseUid: action.payload.uid,
-                isAuthenticated: true,
+                //isAuthenticated: true,
                 loading: false,
             };
         case WALLET_LOGOUT:

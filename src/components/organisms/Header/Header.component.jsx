@@ -7,10 +7,7 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { chain } from "wagmi";
 
 import { logout } from "../../../redux/auth/auth.actions";
-import {
-    walletLogin,
-    walletLogout,
-} from "../../../redux/auth/auth.actions";
+import { walletLogin, walletLogout } from "../../../redux/auth/auth.actions";
 import getDisplayAddress from "../../../utils/getDisplayAddress";
 
 import { ReactComponent as Search } from "../../../assets/Search.svg";
@@ -54,7 +51,7 @@ const Header = ({
     };
 
     const AuthLinks = () => {
-        if (user.address) {
+        if (user && user.address) {
             return (
                 <div className="btns">
                     {getDisplayAddress(user.address)}
@@ -67,7 +64,7 @@ const Header = ({
                     </button>
                 </div>
             );
-        } else if (loading || user === null) {
+        } else if (loading || !user) {
             return (
                 <div className="btns">
                     <Spinner width="50px" height="50px" />
@@ -75,18 +72,21 @@ const Header = ({
                         text={"Log out"}
                         link={"/login"}
                         type={"s-btn__filled"}
-                        handleClick={logout}
+                        handleClick={onDisconnectBtnClick}
                     />
                 </div>
             );
         } else {
             return (
                 <div className="btns">
-                    <Link to={`/users/${user.id}`} title={user.username}>
+                    <Link
+                        to={`/users/${user && user.id}`}
+                        title={user && user.username}
+                    >
                         <img
                             alt="user-logo"
                             className="logo"
-                            src={user.gravatar}
+                            src={user && user.gravatar}
                         />
                     </Link>
                     <LinkButton
