@@ -1,6 +1,6 @@
 import { initializeApp } from "@firebase/app";
 import { getAuth, browserSessionPersistence } from "@firebase/auth";
-import { connectFunctionsEmulator, getFunctions } from "@firebase/functions";
+import { getFunctions } from "@firebase/functions";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getMoralisAuth } from "@moralisweb3/client-firebase-auth-utils";
 
