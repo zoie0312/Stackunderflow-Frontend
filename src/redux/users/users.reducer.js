@@ -1,41 +1,55 @@
-import {GET_USERS, GET_USER, USER_ERROR, UPDATE_USER_SCORE} from './users.types';
+import {
+    GET_USERS,
+    GET_USER,
+    USER_ERROR,
+    UPDATE_USER_SCORE,
+    UPDATE_USER_NAME,
+} from "./users.types";
 
 const initialState = {
-  users: [],
-  user: null,
-  loading: true,
-  error: {},
+    users: [],
+    user: null,
+    loading: true,
+    error: {},
 };
 
 export default function users(state = initialState, action) {
-  switch (action.type) {
-    case GET_USERS:
-      return {
-        ...state,
-        users: action.payload,
-        loading: false,
-      };
-    case GET_USER:
-      return {
-        ...state,
-        user: action.payload,
-        loading: false,
-      };
-    case UPDATE_USER_SCORE:
-        return {
-            ...state,
-            user: {
-                ...state.user,
-                scores: action.payload
-            }
-        };
-    case USER_ERROR:
-      return {
-        ...state,
-        error: action.payload,
-        loading: false,
-      };
-    default:
-      return state;
-  }
+    switch (action.type) {
+        case GET_USERS:
+            return {
+                ...state,
+                users: action.payload,
+                loading: false,
+            };
+        case GET_USER:
+            return {
+                ...state,
+                user: action.payload,
+                loading: false,
+            };
+        case UPDATE_USER_SCORE:
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    scores: action.payload,
+                },
+            };
+        case UPDATE_USER_NAME:
+            return {
+                ...state,
+                user: {
+                    ...state.user,
+                    username: action.payload,
+                },
+            };
+        case USER_ERROR:
+            return {
+                ...state,
+                error: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
 }

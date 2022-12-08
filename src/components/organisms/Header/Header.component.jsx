@@ -54,7 +54,12 @@ const Header = ({
         if (user && user.address) {
             return (
                 <div className="btns">
-                    {getDisplayAddress(user.address)}
+                    <Link
+                        to={`/users/${user && user.id}`}
+                        title={user && user.username}
+                    >
+                        {getDisplayAddress(user.address)}
+                    </Link>
 
                     <button
                         className={`s-btn s-btn__primary`}

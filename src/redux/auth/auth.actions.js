@@ -2,7 +2,7 @@ import { signInWithMoralis as signInWithMoralisByEvm } from "@moralisweb3/client
 import { db } from "../../firebase";
 import { getDoc, doc, setDoc, serverTimestamp } from "firebase/firestore";
 
-import { loadUserData, registerUser, loginUser } from "../../api/authApi";
+import { registerUser, loginUser } from "../../api/authApi";
 import setAuthToken from "./auth.utils";
 import { setAlert } from "../alert/alert.actions";
 import {
@@ -19,15 +19,12 @@ import {
 } from "./auth.types";
 import { auth, moralisAuth } from "../../firebase";
 
-
 // Load User
 export const loadUser = () => async (dispatch) => {
     // if (localStorage.token) {
     //     setAuthToken(localStorage.token);
     // }
     try {
-        //const res = await loadUserData();
-
         if (auth.currentUser) {
             const docRef = doc(db, "users", auth.currentUser.uid);
             const docSnap = await getDoc(docRef);
@@ -36,7 +33,6 @@ export const loadUser = () => async (dispatch) => {
                 payload: docSnap.data(),
             });
         }
-        
     } catch (err) {
         dispatch({
             type: AUTH_ERROR,
@@ -45,39 +41,40 @@ export const loadUser = () => async (dispatch) => {
 };
 
 export const loadUserByWallet = (userCredential) => async (dispatch) => {
-    const {displayName: address, uid} = userCredential;
+    const { displayName: address, uid } = userCredential;
     const docRef = doc(db, "users", uid);
     const docSnap = await getDoc(docRef);
     const userData = docSnap.data();
-    console.log("userData: ", userData);
     if (!userData) {
-        await setDoc(doc(db, 'users', uid), {
+        await setDoc(doc(db, "users", uid), {
             id: uid,
             address,
-            username: 'new user',
+            username: "new user",
             created_at: serverTimestamp(),
-            gravatar: `https://secure.gravatar.com/avatar/${Math.floor(Math.random()*100)+1}?s=164&d=identicon`,
+            gravatar: `https://secure.gravatar.com/avatar/${
+                Math.floor(Math.random() * 100) + 1
+            }?s=164&d=identicon`,
             scores: {},
             posts_count: 0,
-            tags_count: 0
+            tags_count: 0,
         });
         dispatch({
             type: USER_LOADED,
             payload: {
                 id: uid,
                 address,
-                username: 'new user',
-                scores: {}
+                username: "new user",
+                scores: {},
             },
         });
-    }else {
+    } else {
         dispatch({
             type: USER_LOADED,
             payload: {
                 address,
                 username: userData.username,
                 id: userData.id,
-                scores: userData.scores
+                scores: userData.scores,
             },
         });
     }
@@ -161,4 +158,3 @@ export const logout = () => (dispatch) => {
 
     dispatch({ type: LOGOUT });
 };
-

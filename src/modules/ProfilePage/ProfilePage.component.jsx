@@ -17,7 +17,7 @@ const ProfilePage = ({ getProfile, user: { user, loading } }) => {
     useEffect(() => {
         getProfile(id);
         // eslint-disable-next-line
-    }, [getProfile]);
+    }, [getProfile, id]);
 
     return loading || user === null ? (
         <Spinner type="page" width="75px" height="200px" />
@@ -45,7 +45,7 @@ const ProfilePage = ({ getProfile, user: { user, loading } }) => {
                 </div>
                 <div className="row-grid">
                     <ExternalUserDetails />
-                    <UserActivity />
+                    <UserActivity user={user} />
                 </div>
             </div>
         </Fragment>

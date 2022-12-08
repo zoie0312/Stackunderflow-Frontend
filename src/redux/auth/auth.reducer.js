@@ -71,6 +71,7 @@ export default function auth(state = initialState, action) {
                 walletAddress: null,
                 firebaseUid: null,
                 isAuthenticated: false,
+                user: null,
                 loading: false,
             };
         default:

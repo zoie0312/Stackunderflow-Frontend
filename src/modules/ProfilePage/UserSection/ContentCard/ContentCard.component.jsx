@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import moment from "moment";
 import { NFTStorage, File } from "nft.storage";
 import html2canvas from "html2canvas";
 import { useAccount } from "wagmi";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import TextField from "@mui/material/TextField";
+import Stack from "@mui/material/Stack";
+import { useParams } from "react-router-dom";
 
 import "./ContentCard.styles.scss";
 import useNextTokenId from "../../../../hooks/useNextTokenId";
 import useNFTMint from "../../../../hooks/useNFTMint";
 import useNFTBalance from "../../../../hooks/useNFTBalance";
 import useUpdateNFT from "../../../../hooks/useUpdateNFT";
+import { ReactComponent as EditLogo } from "../../../../assets/Edit.svg";
+import { updateUsername } from "../../../../redux/users/users.actions";
 
 // const scores = {
 //     css: 5,
@@ -53,13 +63,17 @@ const ContentCard = ({
     created_at,
     id,
     scores,
+    auth,
+    updateUsername,
 }) => {
     const [metadataUri, setMetadataUri] = useState("");
     const [readyToUpdate, setReadyToUpdate] = useState(false);
     const [isSendingScore, setIsSendingScore] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [userInput, setUserInput] = useState("");
     const { nextTokenId } = useNextTokenId();
     const { balance } = useNFTBalance();
-    const { mint: mintNFT, status: mintStatus, data } = useNFTMint(metadataUri);
+    const { mint: mintNFT } = useNFTMint(metadataUri);
     const { updateUserNFT, status: updateStatus } = useUpdateNFT(metadataUri);
     const { isConnected, address } = useAccount();
     if (isConnected) {
@@ -67,7 +81,11 @@ const ContentCard = ({
     } else {
         console.log("wallet not connected");
     }
-    console.log("nextTokenId: ", nextTokenId);
+    //console.log("nextTokenId: ", nextTokenId);
+
+    const { id: userId } = useParams();
+    const editable =
+        auth && auth.isAuthenticated && auth.user && auth.user.id === userId;
 
     useEffect(() => {
         const wordCloudCtr = document.getElementsByClassName(
@@ -102,20 +120,9 @@ const ContentCard = ({
 
     const onIPFSStoringClick = async () => {
         setIsSendingScore(true);
-        const mainBar = document.getElementById("mainbar");
-        console.log(
-            "screenshooting user profile and score word-cloud then send to IPFS "
-        );
-
-        const userCanvas = await html2canvas(mainBar);
-        const userBlob = await new Promise((resolve) =>
-            userCanvas.toBlob(resolve)
-        );
-        const userFile = new File([userBlob], "user_score_proof.png", {
-            type: "image/png",
-        });
-        const userScoreCid = await client.storeDirectory([userFile]); //for directly storing file(s) in IPFS
-        console.log("ipfs user profile cid ", userScoreCid);
+        // console.log(
+        //     "screenshooting score word-cloud then send to IPFS "
+        // );
 
         const wordCloudTarget = document.querySelector(".wordCloud-container");
         const wordCloudCanvas = await html2canvas(wordCloudTarget);
@@ -127,14 +134,13 @@ const ContentCard = ({
         });
         const metadata = composeMetadata(wordCloudFile, scores, nextTokenId);
         const wordCloudMetadata = await client.store(metadata);
-        console.log("ipfs user score NFT metadata ", wordCloudMetadata);
+        //console.log("ipfs user score NFT metadata ", wordCloudMetadata);
         setMetadataUri(wordCloudMetadata.url);
         setReadyToUpdate(true);
         setIsSendingScore(false);
     };
 
     const onMintClick = () => {
-        console.log("gonig to mint NFT");
         if (metadataUri) {
             mintNFT();
             setMetadataUri("");
@@ -143,12 +149,27 @@ const ContentCard = ({
     };
 
     const onUpdateClick = () => {
-        console.log("gonig to update NFT");
         if (metadataUri) {
             updateUserNFT();
             setMetadataUri("");
             setReadyToUpdate(false);
         }
+    };
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => setOpen(false);
+    const onSaveClick = () => {
+        updateUsername({ user: auth.user, newName: userInput });
+        setOpen(false);
+        setUserInput("");
+    };
+    const onCancelClick = () => {
+        setOpen(false);
+    };
+    const handleChange = (e) => {
+        setUserInput(e.target.value);
     };
 
     return (
@@ -158,7 +179,70 @@ const ContentCard = ({
                     <div className="info">
                         <div className="details">
                             <h2>{username}</h2>
+                            <button
+                                type="button"
+                                className="s-btn p0 ml6"
+                                data-action="s-modal#show"
+                                onClick={handleOpen}
+                                disabled={!editable}
+                            >
+                                <EditLogo className="edit" />
+                            </button>
                         </div>
+                        <div>
+                            <Modal
+                                open={open}
+                                onClose={handleClose}
+                                aria-labelledby="modal-modal-title"
+                                aria-describedby="modal-modal-description"
+                            >
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        width: 300,
+                                        bgcolor: "background.paper",
+                                        border: "2px solid #000",
+                                        boxShadow: 24,
+                                        p: 4,
+                                        color: "black",
+                                    }}
+                                >
+                                    <Typography
+                                        id="modal-modal-title"
+                                        variant="h6"
+                                        component="h2"
+                                    >
+                                        Update Username
+                                    </Typography>
+                                    <TextField
+                                        //ref={inputRef}
+                                        margin="normal"
+                                        placeholder={username}
+                                        helperText="please enter name"
+                                        value={userInput}
+                                        onChange={handleChange}
+                                    />
+                                    <Stack mt={4} spacing="2" direction="row">
+                                        <Button
+                                            variant="text"
+                                            onClick={onSaveClick}
+                                        >
+                                            Save Change
+                                        </Button>
+                                        <Button
+                                            variant="text"
+                                            onClick={onCancelClick}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                            </Modal>
+                        </div>
+
                         <div className="date">
                             <p>
                                 user created &nbsp;-&nbsp;
@@ -223,6 +307,7 @@ const ContentCard = ({
                         }`}
                         type="button"
                         onClick={onIPFSStoringClick}
+                        disabled={!editable}
                     >
                         Send score proof to IPFS
                     </button>
@@ -251,4 +336,8 @@ const ContentCard = ({
     );
 };
 
-export default ContentCard;
+const mapStateToProps = (state) => ({
+    auth: state.auth,
+});
+
+export default connect(mapStateToProps, { updateUsername })(ContentCard);

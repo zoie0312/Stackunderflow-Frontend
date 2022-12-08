@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { Switch } from "react-router-dom";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 import store from "./redux/store";
 import setAuthToken from "./redux/auth/auth.utils";
@@ -44,14 +44,9 @@ const { chains, provider } = configureChains(
     ]
 );
 
-const { connectors } = getDefaultWallets({
-    appName: "My RainbowKit App",
-    chains,
-});
-
 const wagmiClient = createClient({
     autoConnect: true,
-    connectors,
+    connectors: [new InjectedConnector({ chains })],
     provider,
 });
 
@@ -66,89 +61,87 @@ const App = () => {
 
     return (
         <WagmiConfig client={wagmiClient}>
-            <RainbowKitProvider chains={chains}>
-                <Provider store={store}>
-                    <div className="App">
-                        <Header />
-                        <Alert />
-                        <Switch>
-                            <LayoutRoute
-                                exact
-                                path="/"
-                                title="Stack Underflow - Where Developers Learn, Share, & Build Careers"
-                            >
-                                <HomePage />
-                            </LayoutRoute>
-                            <LayoutRoute
-                                exact
-                                path="/questions"
-                                title="All Questions - CLONE Stack Overflow"
-                            >
-                                <QuestionsPage />
-                            </LayoutRoute>
-                            <LayoutRoute
-                                exact
-                                path="/tags"
-                                title="Tags - CLONE Stack Overflow"
-                            >
-                                <AllTagsPage />
-                            </LayoutRoute>
-                            <LayoutRoute
-                                exact
-                                path="/users"
-                                title="Users - CLONE Stack Overflow"
-                            >
-                                <AllUsersPage />
-                            </LayoutRoute>
-                            <BaseRoute
-                                exact
-                                path="/register"
-                                title="Sign Up - CLONE Stack Overflow"
-                            >
-                                <Register />
-                            </BaseRoute>
-                            <BaseRoute
-                                exact
-                                path="/login"
-                                title="Log In - CLONE Stack Overflow"
-                            >
-                                <Login />
-                            </BaseRoute>
-                            <LayoutRoute
-                                exact
-                                path="/questions/:id"
-                                title="Users - CLONE Stack Overflow"
-                            >
-                                <Post />
-                            </LayoutRoute>
-                            <LayoutRoute
-                                exact
-                                path="/users/:id"
-                                title="Users - CLONE Stack Overflow"
-                            >
-                                <ProfilePage />
-                            </LayoutRoute>
-                            <LayoutRoute
-                                exact
-                                path="/tags/:tagname"
-                                title="Users - CLONE Stack Overflow"
-                            >
-                                <TagPage />
-                            </LayoutRoute>
-                            <BaseRoute
-                                exact
-                                path="/add/question"
-                                title="Ask a Question - CLONE Stack Overflow"
-                            >
-                                <PostForm />
-                            </BaseRoute>
-                            <BaseRoute path="*" title="Error 404">
-                                <NotFound />
-                            </BaseRoute>
-                        </Switch>
-                    </div>
-                </Provider>
-            </RainbowKitProvider>
+            <Provider store={store}>
+                <div className="App">
+                    <Header />
+                    <Alert />
+                    <Switch>
+                        <LayoutRoute
+                            exact
+                            path="/"
+                            title="Stack Underflow - Where Developers Learn, Share, & Build Careers"
+                        >
+                            <HomePage />
+                        </LayoutRoute>
+                        <LayoutRoute
+                            exact
+                            path="/questions"
+                            title="All Questions - CLONE Stack Overflow"
+                        >
+                            <QuestionsPage />
+                        </LayoutRoute>
+                        <LayoutRoute
+                            exact
+                            path="/tags"
+                            title="Tags - CLONE Stack Overflow"
+                        >
+                            <AllTagsPage />
+                        </LayoutRoute>
+                        <LayoutRoute
+                            exact
+                            path="/users"
+                            title="Users - CLONE Stack Overflow"
+                        >
+                            <AllUsersPage />
+                        </LayoutRoute>
+                        <BaseRoute
+                            exact
+                            path="/register"
+                            title="Sign Up - CLONE Stack Overflow"
+                        >
+                            <Register />
+                        </BaseRoute>
+                        <BaseRoute
+                            exact
+                            path="/login"
+                            title="Log In - CLONE Stack Overflow"
+                        >
+                            <Login />
+                        </BaseRoute>
+                        <LayoutRoute
+                            exact
+                            path="/questions/:id"
+                            title="Users - CLONE Stack Overflow"
+                        >
+                            <Post />
+                        </LayoutRoute>
+                        <LayoutRoute
+                            exact
+                            path="/users/:id"
+                            title="Users - CLONE Stack Overflow"
+                        >
+                            <ProfilePage />
+                        </LayoutRoute>
+                        <LayoutRoute
+                            exact
+                            path="/tags/:tagname"
+                            title="Users - CLONE Stack Overflow"
+                        >
+                            <TagPage />
+                        </LayoutRoute>
+                        <BaseRoute
+                            exact
+                            path="/add/question"
+                            title="Ask a Question - CLONE Stack Overflow"
+                        >
+                            <PostForm />
+                        </BaseRoute>
+                        <BaseRoute path="*" title="Error 404">
+                            <NotFound />
+                        </BaseRoute>
+                    </Switch>
+                </div>
+            </Provider>
         </WagmiConfig>
     );
 };

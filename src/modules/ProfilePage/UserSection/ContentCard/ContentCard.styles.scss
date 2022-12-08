@@ -25,6 +25,8 @@
         .details {
           margin-top: 4px;
           margin-bottom: 4px;
+          display: flex;
+          align-items: flex-start;
 
           h2 {
             word-break: break-all !important;
@@ -33,6 +35,13 @@
             display: flex;
             align-items: center;
             flex-wrap: wrap;
+          }
+
+          .edit {
+            background-color: white;
+            height: 25px;
+            width: 25px;
+            border-radius: 5px;
           }
         }
 

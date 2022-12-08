@@ -9,7 +9,6 @@
     "@moralisweb3/client-firebase-evm-auth": "^2.6.7",
     "@mui/icons-material": "^5.5.0",
     "@mui/material": "^5.5.0",
-    "@rainbow-me/rainbowkit": "^0.7.1",
     "@stackoverflow/stacks-icons": "^2.25.1",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
